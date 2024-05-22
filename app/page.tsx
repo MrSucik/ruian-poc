@@ -14,31 +14,24 @@ const validate = (values: { address: string }) => {
   return errors;
 };
 
-const fetchMapboxSuggestions = async (address: string) => {
-  const response = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${address}.json?access_token=${mapboxApiToken}`
-  );
-  const data = await response.json();
-  return data.features.map((feature: any) => feature.place_name);
-};
-
-const fetchGoogleSuggestions = async (address: string) => {
-  const response = await fetch(
-    `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${address}&key=${googleApiToken}&types=geocode`
-  );
-  const data = await response.json();
-  return data.predictions.map((prediction: any) => prediction.description);
-};
-
 export default function Home() {
   const [open, setOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
   const fetchSuggestions = async (address: string) => {
-    const mapboxSuggestions = await fetchMapboxSuggestions(address);
-    const googleSuggestions = await fetchGoogleSuggestions(address);
+    const mapboxSuggestions = await fetch(
+      "/api/suggest-places?type=mapbox&address=" + address
+    ).then((res) => res.json());
+    const googleSuggestions = await fetch(
+      "/api/suggest-places?type=google&address=" + address
+    ).then((res) => res.json());
 
-    console.log("Mapbox Suggestions", googleSuggestions);
+    console.log(
+      "Mapbox Suggestions",
+      mapboxSuggestions,
+      "Google Suggestions",
+      googleSuggestions
+    );
 
     setSuggestions(mapboxSuggestions);
   };
