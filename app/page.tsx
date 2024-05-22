@@ -63,8 +63,8 @@ export default function Home() {
               />
               <p>Current suggestions API: {api}</p>
             </div>
-            <details className="dropdown" open={open}>
-              <summary>
+            <div className="dropdown">
+              <div>
                 <input
                   type="address"
                   name="address"
@@ -77,8 +77,8 @@ export default function Home() {
                   onFocus={() => setOpen(true)}
                   value={values.address}
                 />
-              </summary>
-              {!!suggestions.length && (
+              </div>
+              {open && !!suggestions.length && (
                 <ul className="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box">
                   {suggestions.map((suggestion) => (
                     <li key={suggestion}>
@@ -96,7 +96,7 @@ export default function Home() {
                   ))}
                 </ul>
               )}
-            </details>
+            </div>
             {errors.address && touched.address && (
               <div role="alert" className="alert alert-error p-2">
                 <svg
