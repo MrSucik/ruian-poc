@@ -3,9 +3,6 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
 
-const mapboxApiToken = process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN;
-const googleApiToken = process.env.NEXT_PUBLIC_GOOGLE_API_TOKEN;
-
 const validate = (values: { address: string }) => {
   const errors: { address?: string } = {};
   if (!values.address) {
@@ -121,8 +118,8 @@ export default function Home() {
             {values.address && (
               <iframe
                 title="Google Maps"
-                src={`https://www.google.com/maps/embed/v1/place?key=${googleApiToken}&q=${values.address}`}
-                className="w-full h-48"
+                src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_API_TOKEN}&q=${values.address}`}
+                className="w-full h-64"
               ></iframe>
             )}
             <button
