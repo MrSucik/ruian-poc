@@ -15,25 +15,19 @@ const validate = (values: { address: string }) => {
 };
 
 export default function Home() {
+  const [api, setApi] = useState<"mapbox" | "google">("mapbox");
   const [open, setOpen] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
 
-  const fetchSuggestions = async (address: string) => {
-    const mapboxSuggestions = await fetch(
-      "/api/suggest-places?type=mapbox&address=" + address
-    ).then((res) => res.json());
-    const googleSuggestions = await fetch(
-      "/api/suggest-places?type=google&address=" + address
-    ).then((res) => res.json());
+  const fetchSuggestions = async (
+    address: string,
+    type: "mapbox" | "google" = api
+  ) => {
+    const result = await (
+      await fetch(`/api/suggest-places?type=${type}&address=${address}`)
+    ).json();
 
-    console.log(
-      "Mapbox Suggestions",
-      mapboxSuggestions,
-      "Google Suggestions",
-      googleSuggestions
-    );
-
-    setSuggestions(mapboxSuggestions);
+    setSuggestions(result);
   };
 
   return (
@@ -59,6 +53,19 @@ export default function Home() {
           setFieldValue,
         }) => (
           <form onSubmit={handleSubmit} className="grid gap-2 w-full">
+            <div className="flex gap-2">
+              <input
+                type="checkbox"
+                className="toggle"
+                value={api}
+                onChange={() => {
+                  const newType = api === "mapbox" ? "google" : "mapbox";
+                  setApi(newType);
+                  fetchSuggestions(values.address, newType);
+                }}
+              />
+              <p>Current suggestions API: {api}</p>
+            </div>
             <details className="dropdown" open={open}>
               <summary>
                 <input
