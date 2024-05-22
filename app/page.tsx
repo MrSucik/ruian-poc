@@ -3,6 +3,9 @@
 import React, { useState } from "react";
 import { Formik } from "formik";
 
+const mapboxApiToken = process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN;
+const googleApiToken = process.env.NEXT_PUBLIC_GOOGLE_API_TOKEN;
+
 const validate = (values: { address: string }) => {
   const errors: { address?: string } = {};
   if (!values.address) {
@@ -11,8 +14,34 @@ const validate = (values: { address: string }) => {
   return errors;
 };
 
+const fetchMapboxSuggestions = async (address: string) => {
+  const response = await fetch(
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${address}.json?access_token=${mapboxApiToken}`
+  );
+  const data = await response.json();
+  return data.features.map((feature: any) => feature.place_name);
+};
+
+const fetchGoogleSuggestions = async (address: string) => {
+  const response = await fetch(
+    `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${address}&key=${googleApiToken}&types=geocode`
+  );
+  const data = await response.json();
+  return data.predictions.map((prediction: any) => prediction.description);
+};
+
 export default function Home() {
   const [open, setOpen] = useState(false);
+  const [suggestions, setSuggestions] = useState<string[]>([]);
+
+  const fetchSuggestions = async (address: string) => {
+    const mapboxSuggestions = await fetchMapboxSuggestions(address);
+    const googleSuggestions = await fetchGoogleSuggestions(address);
+
+    console.log("Mapbox Suggestions", googleSuggestions);
+
+    setSuggestions(mapboxSuggestions);
+  };
 
   return (
     <main className="container grid place-items-center h-screen mx-auto">
@@ -43,50 +72,33 @@ export default function Home() {
                   type="address"
                   name="address"
                   className="input input-primary w-full"
-                  onChange={handleChange}
+                  onChange={(e) => {
+                    handleChange(e);
+                    fetchSuggestions(e.target.value);
+                  }}
                   onBlur={handleBlur}
                   onFocus={() => setOpen(true)}
                   value={values.address}
                 />
               </summary>
-              <ul className="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box w-52">
-                <li>
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => {
-                      setFieldValue("address", "xx");
-                      setOpen(false);
-                    }}
-                    type="button"
-                  >
-                    Address 1
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => {
-                      setFieldValue("address", "xx");
-                      setOpen(false);
-                    }}
-                    type="button"
-                  >
-                    Address 2
-                  </button>
-                </li>
-                <li>
-                  <button
-                    className="btn btn-secondary"
-                    onClick={() => {
-                      setFieldValue("address", "xx");
-                      setOpen(false);
-                    }}
-                    type="button"
-                  >
-                    Address 3
-                  </button>
-                </li>
-              </ul>
+              {!!suggestions.length && (
+                <ul className="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box">
+                  {suggestions.map((suggestion) => (
+                    <li key={suggestion}>
+                      <button
+                        className="btn btn-ghost justify-start"
+                        onClick={() => {
+                          setFieldValue("address", suggestion);
+                          setOpen(false);
+                        }}
+                        type="button"
+                      >
+                        {suggestion}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </details>
             {errors.address && touched.address && (
               <div role="alert" className="alert alert-error p-2">
@@ -105,6 +117,13 @@ export default function Home() {
                 </svg>
                 <span>{errors.address}</span>
               </div>
+            )}
+            {values.address && (
+              <iframe
+                title="Google Maps"
+                src={`https://www.google.com/maps/embed/v1/place?key=${googleApiToken}&q=${values.address}`}
+                className="w-full h-48"
+              ></iframe>
             )}
             <button
               type="submit"
