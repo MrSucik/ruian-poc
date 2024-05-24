@@ -14,7 +14,7 @@ const validate = (values: { address: string }) => {
 
 export default function Home() {
   return (
-    <main className="container grid place-items-center h-screen mx-auto">
+    <main className="d-flex justify-content-center align-items-center vh-100 mx-auto">
       <Formik
         initialValues={{ address: "" }}
         validate={validate}
@@ -35,7 +35,11 @@ export default function Home() {
           isSubmitting,
           setFieldValue,
         }) => (
-          <form onSubmit={handleSubmit} className="grid gap-2 w-full">
+          <form
+            onSubmit={handleSubmit}
+            className="d-grid gap-2 w-100"
+            style={{ maxWidth: "400px" }}
+          >
             <AddressAutocomplete
               values={values}
               handleChange={handleChange}
@@ -43,12 +47,21 @@ export default function Home() {
               setFieldValue={setFieldValue}
             />
             {errors.address && touched.address && (
-              <div role="alert" className="alert alert-error p-2">
+              <div
+                role="alert"
+                className="alert alert-danger p-2 d-flex align-items-center gap-2"
+                style={{ maxHeight: "64px" }}
+              >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="stroke-current shrink-0 h-6 w-6"
                   fill="none"
                   viewBox="0 0 24 24"
+                  style={{
+                    height: "1.5rem",
+                    width: "1.5rem",
+                    flexShrink: 0,
+                    stroke: "currentColor",
+                  }}
                 >
                   <path
                     strokeLinecap="round"
@@ -64,7 +77,7 @@ export default function Home() {
               <iframe
                 title="Google Maps"
                 src={`https://www.google.com/maps/embed/v1/place?key=${process.env.NEXT_PUBLIC_GOOGLE_API_TOKEN}&q=${values.address}`}
-                className="w-full h-64"
+                className="w-100 h-64"
               ></iframe>
             )}
             <button

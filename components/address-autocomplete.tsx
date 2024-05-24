@@ -28,7 +28,7 @@ export const AddressAutocomplete = ({
         <input
           type="address"
           name="address"
-          className="input input-primary w-full"
+          className="form-control"
           onChange={(e) => {
             handleChange(e);
             fetchSuggestions(e.target.value);
@@ -39,11 +39,11 @@ export const AddressAutocomplete = ({
         />
       </div>
       {open && !!suggestions.length && (
-        <ul className="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box">
+        <ul className="dropdown-menu show" style={{ position: "absolute" }}>
           {suggestions.map((suggestion) => (
             <li key={suggestion}>
               <button
-                className="btn btn-ghost justify-start"
+                className="dropdown-item"
                 onClick={() => {
                   setFieldValue("address", suggestion);
                   setOpen(false);
