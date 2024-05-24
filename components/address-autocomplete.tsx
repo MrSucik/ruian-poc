@@ -1,3 +1,4 @@
+import { useSuggestions } from "#/hooks/use-suggestions";
 import { ChangeEvent, FocusEvent, useState } from "react";
 
 export const AddressAutocomplete = ({
@@ -11,16 +12,8 @@ export const AddressAutocomplete = ({
   handleBlur: (e: FocusEvent<HTMLInputElement>) => void;
   setFieldValue: (field: string, value: string) => void;
 }) => {
-  const [open, setOpen] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-
-  const fetchSuggestions = async (address: string) => {
-    const result = await (
-      await fetch(`/api/suggest-places?address=${address}`)
-    ).json();
-
-    setSuggestions(result);
-  };
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const { suggestions, fetchSuggestions } = useSuggestions();
 
   return (
     <div className="dropdown">
@@ -34,11 +27,11 @@ export const AddressAutocomplete = ({
             fetchSuggestions(e.target.value);
           }}
           onBlur={handleBlur}
-          onFocus={() => setOpen(true)}
+          onFocus={() => setDropdownOpen(true)}
           value={values.address}
         />
       </div>
-      {open && !!suggestions.length && (
+      {dropdownOpen && !!suggestions.length && (
         <ul className="dropdown-menu show" style={{ position: "absolute" }}>
           {suggestions.map((suggestion) => (
             <li key={suggestion}>
@@ -46,7 +39,7 @@ export const AddressAutocomplete = ({
                 className="dropdown-item"
                 onClick={() => {
                   setFieldValue("address", suggestion);
-                  setOpen(false);
+                  setDropdownOpen(false);
                 }}
                 type="button"
               >
