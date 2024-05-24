@@ -11,7 +11,7 @@ const suggestGoogle = async (address: string) => {
 
 const suggestMapbox = async (address: string) => {
   const response = await fetch(
-    `https://api.mapbox.com/geocoding/v5/mapbox.places/${address}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}&bbox=12.09,48.55,18.87,51.06`
+    `https://api.mapbox.com/geocoding/v5/mapbox.places/${address}.json?access_token=${process.env.NEXT_PUBLIC_MAPBOX_API_TOKEN}`
   );
   const data = await response.json();
 
