@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { Formik } from "formik";
+import { AddressAutocomplete } from "#/components/address-autocomplete";
 
 const validate = (values: { address: string }) => {
   const errors: { address?: string } = {};
@@ -12,21 +13,6 @@ const validate = (values: { address: string }) => {
 };
 
 export default function Home() {
-  const [api, setApi] = useState<"mapbox" | "google">("mapbox");
-  const [open, setOpen] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-
-  const fetchSuggestions = async (
-    address: string,
-    type: "mapbox" | "google" = api
-  ) => {
-    const result = await (
-      await fetch(`/api/suggest-places?type=${type}&address=${address}`)
-    ).json();
-
-    setSuggestions(result);
-  };
-
   return (
     <main className="container grid place-items-center h-screen mx-auto">
       <Formik
@@ -50,53 +36,12 @@ export default function Home() {
           setFieldValue,
         }) => (
           <form onSubmit={handleSubmit} className="grid gap-2 w-full">
-            <div className="flex gap-2">
-              <input
-                type="checkbox"
-                className="toggle"
-                value={api}
-                onChange={() => {
-                  const newType = api === "mapbox" ? "google" : "mapbox";
-                  setApi(newType);
-                  fetchSuggestions(values.address, newType);
-                }}
-              />
-              <p>Current suggestions API: {api}</p>
-            </div>
-            <div className="dropdown">
-              <div>
-                <input
-                  type="address"
-                  name="address"
-                  className="input input-primary w-full"
-                  onChange={(e) => {
-                    handleChange(e);
-                    fetchSuggestions(e.target.value);
-                  }}
-                  onBlur={handleBlur}
-                  onFocus={() => setOpen(true)}
-                  value={values.address}
-                />
-              </div>
-              {open && !!suggestions.length && (
-                <ul className="p-2 shadow menu dropdown-content z-[1] bg-base-100 rounded-box">
-                  {suggestions.map((suggestion) => (
-                    <li key={suggestion}>
-                      <button
-                        className="btn btn-ghost justify-start"
-                        onClick={() => {
-                          setFieldValue("address", suggestion);
-                          setOpen(false);
-                        }}
-                        type="button"
-                      >
-                        {suggestion}
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
+            <AddressAutocomplete
+              values={values}
+              handleChange={handleChange}
+              handleBlur={handleBlur}
+              setFieldValue={setFieldValue}
+            />
             {errors.address && touched.address && (
               <div role="alert" className="alert alert-error p-2">
                 <svg
